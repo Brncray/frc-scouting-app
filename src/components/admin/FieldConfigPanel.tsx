@@ -128,7 +128,9 @@ export default function FieldConfigPanel() {
                   properties: ['openFile'],
                 })
                 if (!result.canceled && result.filePaths[0]) {
-                  // Read and downsample in renderer using canvas
+                  // Read file via IPC (file:// is blocked by CSP)
+                  const dataUrl = await window.electronAPI.readFileAsDataUrl(result.filePaths[0])
+                  // Downsample in renderer using canvas
                   const img = new Image()
                   img.onload = () => {
                     const canvas = document.createElement('canvas')
@@ -143,11 +145,10 @@ export default function FieldConfigPanel() {
                     canvas.height = h
                     const ctx = canvas.getContext('2d')!
                     ctx.drawImage(img, 0, 0, w, h)
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.5)
-                    updateConfig('baseImageBase64', dataUrl)
+                    const downsampled = canvas.toDataURL('image/jpeg', 0.5)
+                    updateConfig('baseImageBase64', downsampled)
                   }
-                  // Use file:// protocol to load the image
-                  img.src = `file://${result.filePaths[0].replace(/\\/g, '/')}`
+                  img.src = dataUrl
                 }
               }}
               className="w-full px-3 py-2 bg-gray-700 hover:bg-gray-600 text-sm text-gray-300 rounded transition-colors cursor-pointer"

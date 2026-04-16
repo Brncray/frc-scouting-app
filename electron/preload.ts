@@ -17,4 +17,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Dialog
   openFileDialog: (options: any) => ipcRenderer.invoke('dialog:openFile', options),
+  readFileAsDataUrl: (filePath: string) => ipcRenderer.invoke('file:readAsDataUrl', filePath),
 })

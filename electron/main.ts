@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'node:path'
+import fs from 'node:fs'
 import { initDatabase } from './database/connection'
 import { registerFormHandlers } from './database/forms'
 import { registerSubmissionHandlers } from './database/submissions'
@@ -43,6 +44,14 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:openFile', async (_event, options) => {
     const result = await dialog.showOpenDialog(options)
     return result
+  })
+
+  // Read a file and return as base64 data URL
+  ipcMain.handle('file:readAsDataUrl', async (_event, filePath: string) => {
+    const buffer = fs.readFileSync(filePath)
+    const ext = path.extname(filePath).toLowerCase().replace('.', '')
+    const mime = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`
+    return `data:${mime};base64,${buffer.toString('base64')}`
   })
 
   createWindow()

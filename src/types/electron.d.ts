@@ -15,6 +15,7 @@ interface ElectronAPI {
   markImported(id: string): Promise<void>
 
   openFileDialog(options: any): Promise<{ canceled: boolean; filePaths: string[] }>
+  readFileAsDataUrl(filePath: string): Promise<string>
 }
 
 declare global {
